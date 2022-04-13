@@ -9,6 +9,7 @@ public:
         n.getParam("/wheels/r", r); // probably will need 4 different radius instances for each wheel
         n.getParam("/wheels/l", l);
         n.getParam("/wheels/w", w);
+        inv_H0 = inverseH0(r, l, w);
         sub = n.subscribe("/wheel_states", 1000, &Velocity::velocityCallback, this);
         pub = n.advertise<geometry_msgs::TwistStamped>("cmd_vel", 1000);
     }
@@ -35,11 +36,8 @@ public:
     }
 
     // Compute robot linear and angular velocity from wheel angular velocities
-    // (maybe, since the inverse is a constant matrix, it could be useful defined
-    // it as global rather than create one every time I compute a new velocity)
     float[] computeRobotVelocity(float wheels_vel[4]) {
         float robot_vel[3] = {0, 0, 0};
-        float inv_H0[3][4] = inverseH0(l, w);
 
         for(int i = 0; i < 3; i++) {
             for(int j = 0; j < 4; j++) {
@@ -51,10 +49,16 @@ public:
     }
 
     // Compute the inverse of H(0) given wheels l and w (global parameters)
-    float[][] inverseH0(float l, float w) {
+    float[][] inverseH0(float r, float l, float w) {
         float inv_H0[3][4] = {{-0.25/(l+w), 0.25/(l+w), 0.25/(l+w), -0.25/(l+w)},
                                 {0.25, 0.25, 0.25, 0.25},
                                 {-0.25, -0.25, -0.25, -0.25}};
+        
+        for(int i = 0; i < 3; i++) {
+            for(int j = 0; j < 4; j++) {
+                inv_H0[i][j] = r * inv_H0[i][j];
+            }
+        }
         return inv_H0;
     }
 
@@ -77,6 +81,7 @@ private:
     float r;
     float l;
     float w;
+    float inv_H0[3][4];
 };
 
 
