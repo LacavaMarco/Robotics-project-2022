@@ -1,13 +1,13 @@
 <launch>
-    <node pkg="project1" type="p1_velocity" name="velocity_estimator"/>
+    <node pkg="project1" type="velocity" name="velocity_estimator" output="screen"/>
 
     <!-- wheel parameters (probably we will need to differentiate between wheels radius in order to calibrate the odometry) -->
     <param name="wheels/r" value="0.07"/>
     <param name="wheels/l" value="0.200"/>
     <param name="wheels/w" value="0.169"/>
     <!-- Gear ratio (wheel - motor) -->
-    <param name="T" value="5"/>
+    <param name="wheels/T" value="5"/>
     <!-- Encoders resolution [counts (ticks) per revolution] -->
-    <param name="N" value="42"/>
+    <param name="wheels/N" value="42"/>
 
 </launch>
