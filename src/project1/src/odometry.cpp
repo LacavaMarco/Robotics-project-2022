@@ -3,21 +3,6 @@
 class Odometry{
 
 public:
-<<<<<<< HEAD
-  Odometry() { //variabili in cui mi salvo initialpose
-
-    sub = n.subscribe("/cmd_vel", 1000, &Odometry::odometryCallback, this);
-
-  }
-
-  void odometryCallback(/* arguments */) { //get dei parametri della pose attuale, che ho settato con l'odometryCallback di prima.
-    /* code */
-  }
-
-
-
-private:
-=======
   Odometry() { //variables in which I have to save initialpose
     this->prev_t = 0;
     sub_v = n.subscribe("/cmd_vel", 1000, &Odometry::odometryCallback, this);
@@ -79,20 +64,15 @@ private:
   ros::Publisher pub;
 
   time prev_t;
->>>>>>> master
 
 
 }
 
 int main(int argc, char**argv){
-<<<<<<< HEAD
-
-=======
   ros::init(argc, argv, "odometry");
   Odometry odometry;
   while(ros::ok){
     //loop stuff
   }
   return 0;
->>>>>>> master
 }
