@@ -1,6 +1,8 @@
 <launch>
     <node pkg="project1" type="velocity" name="velocity_estimator" output="screen"/>
-
+    <node pkg="project1" type="odometry" name="computed_odometry" output="screen"/>
+    <node pkg="project1" type="tf2broadcaster" name="broadcasted_odometry" output="screen"/>
+    
     <!-- wheel parameters (probably we will need to differentiate between wheels radius in order to calibrate the odometry) -->
     <param name="wheels/r" value="0.07"/>
     <param name="wheels/l" value="0.200"/>
