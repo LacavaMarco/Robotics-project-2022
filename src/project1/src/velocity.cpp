@@ -6,8 +6,8 @@
 #include <array>
 #include <math.h>
 
-class Velocity
-{
+class Velocity {
+
 public:
     Velocity() {
         n.getParam("/wheels/r", r); // probably will need 4 different radius instances for each wheel
@@ -34,7 +34,7 @@ public:
         // between current and previous ticks by the difference between current and previous time stamp (?)
         ros::Time current_time = ros::Time::now();
         double dt = (current_time - last_time).toSec();
-        ROS_INFO ("dt = %f", dt);
+        // ROS_INFO ("dt = %f", dt);
 
         std::array<int, 4> current_ticks = {{0, 0, 0, 0}};
         for(int i = 0; i < 4; i++) {
@@ -43,9 +43,9 @@ public:
         std::array<int, 4> dticks = {{current_ticks[0] - last_ticks[0], current_ticks[1] - last_ticks[1],
                         current_ticks[2] - last_ticks[2], current_ticks[3] - last_ticks[3]}};
 
-        for(int i = 0; i < 4; i++) {
-            ROS_INFO ("dticks[%d] = %d", i, dticks[i]);
-        }
+        // for(int i = 0; i < 4; i++) {
+        //     ROS_INFO ("dticks[%d] = %d", i, dticks[i]);
+        // }
 
         // ROS_INFO ("cpr = %d", cpr);
         // ROS_INFO ("gear_ratio = %d", gear_ratio);
@@ -53,7 +53,7 @@ public:
         std::array<double, 4> wheels_angular_vel = {{0.0, 0.0, 0.0, 0.0}};
         for(int i = 0; i < 4; i++) {
             wheels_angular_vel[i] = 2 * M_PI * dticks[i] / cpr / gear_ratio / dt;
-            ROS_INFO ("wheels_angular_vel[%d] = %f", i, wheels_angular_vel[i]);
+            // ROS_INFO ("wheels_angular_vel[%d] = %f", i, wheels_angular_vel[i]);
         }
 
         std::array<double, 3> robot_vel = computeRobotVelocity(wheels_angular_vel);
@@ -85,7 +85,7 @@ public:
             for(int j = 0; j < 4; j++) {
                 robot_vel[i] += inv_H0[i][j] * wheels_ordered_vel[j];
             }
-            ROS_INFO("robot_vel[%d] = %f", i, robot_vel[i]);
+            // ROS_INFO("robot_vel[%d] = %f", i, robot_vel[i]);
         }
 
         return robot_vel;
@@ -118,7 +118,7 @@ public:
 
 private:
     ros::NodeHandle n;
-    geometry_msgs::TwistStamped robot_velocity;
+    // geometry_msgs::TwistStamped robot_velocity;
     ros::Subscriber sub;
     ros::Publisher pub;
 
