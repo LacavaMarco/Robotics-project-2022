@@ -2,6 +2,7 @@
     <node pkg="project1" type="velocity" name="velocity_estimator" output="screen"/>
     <node pkg="project1" type="odometry" name="odometry_calculator" output="screen"/>
     <node pkg="project1" type="tf2broadcaster" name="odometry_broadcaster" output="screen"/>
+    <node pkg="project1" type="tf2bag" name="bag_broadcaster" output="screen"/>
 
     <!-- wheel parameters (probably we will need to differentiate between wheels radius in order to calibrate the odometry) -->
     <param name="wheels/r" value="0.07"/>
