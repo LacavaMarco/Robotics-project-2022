@@ -14,7 +14,7 @@ public:
         last_time = ros::Time::now();
         isFirstPose = false;
         sub_p = n.subscribe("/robot/pose", 1000, &Odometry::poseCallback, this);
-        sub_v = n.subscribe("/cmd_vel", 1000, &Odometry::odometryCallback, this);
+        // sub_v = n.subscribe("/cmd_vel", 1000, &Odometry::odometryCallback, this);
         pub = n.advertise<nav_msgs::Odometry>("/odom", 1000);
     }
 
@@ -35,33 +35,32 @@ public:
             curr_theta = yaw;
             isFirstPose = true;
             // ROS_INFO("initial pose: (%f, %f, %f)", curr_x, curr_y, curr_theta);
+
+            sub_v = n.subscribe("/cmd_vel", 1000, &Odometry::odometryCallback, this);
         }
     }
 
     void odometryCallback(const geometry_msgs::TwistStamped::ConstPtr& msg_v) {
-
-        ros::Time current_time = ros::Time::now();
+        ros::Time current_time = msg_v->header.stamp;
         //get dei parametri della pose attuale,
         //che ho settato con l'odometryCallback di prima.
-        auto odom_msg = nav_msgs::Odometry();
-        odom_msg.header.frame_id = "";
-        odom_msg.header.stamp = ros::Time::now();
+        robot_odometry.header.frame_id = "odom";
+        robot_odometry.header.stamp = msg_v->header.stamp;
 
         //If the current time is not the first (so if it is not 0), I compute the
         //odometry. If it is the first then I do nothing and I store the value in
         //a last_time variable, which contains the previous time and is updated at
         //the end of every cycle.
 
-        odom_msg.pose.pose = computeEulerOdometry(msg_v->twist.linear,
+        robot_odometry.pose.pose = computeEulerOdometry(msg_v->twist.linear,
                                                 msg_v->twist.angular,
                                                 current_time,
-                                                last_time,
-                                                curr_x, curr_y, curr_theta);
+                                                last_time);
 
-        odom_msg.twist.twist.linear = msg_v->twist.linear;
-        odom_msg.twist.twist.angular = msg_v->twist.angular;
+        robot_odometry.twist.twist.linear = msg_v->twist.linear;
+        robot_odometry.twist.twist.angular = msg_v->twist.angular;
 
-        pub.publish(odom_msg);
+        pub.publish(robot_odometry);
 
         last_time = current_time;
     }
@@ -70,18 +69,19 @@ public:
     geometry_msgs::Pose computeEulerOdometry(geometry_msgs::Vector3 vel_lin,
                                             geometry_msgs::Vector3 vel_ang,
                                             ros::Time current_time,
-                                            ros::Time last_time,
-                                            double x, double y, double theta) {
+                                            ros::Time last_time) {
 
         auto odom_pos = geometry_msgs::Pose();
 
         double dt = (current_time - last_time).toSec(); //sampling period t
 
-        odom_pos.position.x =  x + vel_lin.x * dt;
-        odom_pos.position.y =  y + vel_lin.y * dt;
+        curr_x =  curr_x + vel_lin.x * dt;
+        odom_pos.position.x = curr_x;
+        curr_y =  curr_y + vel_lin.y * dt;
+        odom_pos.position.y = curr_y;
         odom_pos.position.z = 0; //it's alwyas 0, it moves on a plane
 
-        curr_theta = theta + vel_ang.z * dt;
+        curr_theta = curr_theta + vel_ang.z * dt;
 
         tf2::Quaternion q;
         q.setRPY(0, 0, curr_theta);
@@ -89,16 +89,15 @@ public:
         odom_pos.orientation.y = q.y();
         odom_pos.orientation.z = q.z();
         odom_pos.orientation.w = q.w();
-
-        curr_x = odom_pos.position.x;
-        curr_y = odom_pos.position.y;
+        
+        // ROS_INFO("updated pose: (%f, %f, %f)", curr_x, curr_y, curr_theta);
 
         return odom_pos;
     }
 
 private:
     ros::NodeHandle n;
-    // nav_msgs::Odometry robot_odometry;
+    nav_msgs::Odometry robot_odometry;
     ros::Subscriber sub_p;
     ros::Subscriber sub_v;
     ros::Publisher pub;

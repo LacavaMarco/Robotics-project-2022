@@ -34,3 +34,7 @@ target_link_libraries(odometry ${catkin_LIBRARIES})
 add_executable(tf2broadcaster src/tf2broadcaster.cpp)
 add_dependencies(tf2broadcaster ${catkin_EXPORTED_TARGETS} project1_generate_messages)
 target_link_libraries(tf2broadcaster ${catkin_LIBRARIES})
+
+add_executable(tf2bag src/tf2bag.cpp)
+add_dependencies(tf2bag ${catkin_EXPORTED_TARGETS} project1_generate_messages)
+target_link_libraries(tf2bag ${catkin_LIBRARIES})

@@ -32,7 +32,7 @@ public:
         // Ticks are stored in the array position [fl, fr, rl, rr] and they incrementally
         // increase every timestep: to compute each wheel angular velocity I need to divide the difference
         // between current and previous ticks by the difference between current and previous time stamp (?)
-        ros::Time current_time = ros::Time::now();
+        ros::Time current_time = msg->header.stamp;
         double dt = (current_time - last_time).toSec();
         // ROS_INFO ("dt = %f", dt);
 
@@ -53,19 +53,21 @@ public:
         std::array<double, 4> wheels_angular_vel = {{0.0, 0.0, 0.0, 0.0}};
         for(int i = 0; i < 4; i++) {
             wheels_angular_vel[i] = 2 * M_PI * dticks[i] / cpr / gear_ratio / dt;
+            // Compare computed and actual wheels speeds (just for debugging)
             // ROS_INFO ("wheels_angular_vel[%d] = %f", i, wheels_angular_vel[i]);
+            // ROS_INFO ("wheels_bag_vel[%d] = %f\n", i, msg->velocity[i] / 60 / gear_ratio);
         }
+        ROS_INFO ("\n");
 
         std::array<double, 3> robot_vel = computeRobotVelocity(wheels_angular_vel);
 
-        auto vel_msg = geometry_msgs::TwistStamped();
-        vel_msg.header.frame_id = "";
-        vel_msg.header.stamp = ros::Time::now();
+        robot_velocity.header.frame_id = "";
+        robot_velocity.header.stamp = msg->header.stamp;
 
-        vel_msg.twist.linear = toVector3(robot_vel[1], robot_vel[2], 0);
-        vel_msg.twist.angular = toVector3(0, 0, robot_vel[0]);
+        robot_velocity.twist.linear = toVector3(robot_vel[1], robot_vel[2], 0);
+        robot_velocity.twist.angular = toVector3(0, 0, robot_vel[0]);
 
-        pub.publish(vel_msg);
+        pub.publish(robot_velocity);
 
         last_time = current_time;
         for(int i = 0; i < 4; i++) {
@@ -93,13 +95,13 @@ public:
 
     // Compute the inverse of H(0) given wheels r, l and w (global parameters)
     std::array<std::array<double, 4>, 3> inverseH0(double r, double l, double w) {
-        std::array<std::array<double, 4>, 3> inv_H0 = {{{-0.25/(l+w), 0.25/(l+w), 0.25/(l+w), -0.25/(l+w)},
-                                {0.25, 0.25, 0.25, 0.25},
-                                {-0.25, -0.25, -0.25, -0.25}}};
+        std::array<std::array<double, 4>, 3> inv_H0 = {{{-1/(l+w), 1/(l+w), 1/(l+w), -1/(l+w)},
+                                                        {1, 1, 1, 1},
+                                                        {-1, 1, -1, 1}}};
 
         for(int i = 0; i < 3; i++) {
             for(int j = 0; j < 4; j++) {
-                inv_H0[i][j] = r * inv_H0[i][j];
+                inv_H0[i][j] = inv_H0[i][j] * r / 4;
                 // ROS_INFO("inv_H0[%d][%d] = %f  ", i, j, inv_H0[i][j]);
             }
         }
@@ -118,7 +120,7 @@ public:
 
 private:
     ros::NodeHandle n;
-    // geometry_msgs::TwistStamped robot_velocity;
+    geometry_msgs::TwistStamped robot_velocity;
     ros::Subscriber sub;
     ros::Publisher pub;
 
