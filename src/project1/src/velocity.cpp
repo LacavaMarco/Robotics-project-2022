@@ -57,7 +57,7 @@ public:
             // ROS_INFO ("wheels_angular_vel[%d] = %f", i, wheels_angular_vel[i]);
             // ROS_INFO ("wheels_bag_vel[%d] = %f\n", i, msg->velocity[i] / 60 / gear_ratio);
         }
-        ROS_INFO ("\n");
+        // ROS_INFO ("\n");
 
         std::array<double, 3> robot_vel = computeRobotVelocity(wheels_angular_vel);
 

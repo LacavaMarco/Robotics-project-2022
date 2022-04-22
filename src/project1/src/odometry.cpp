@@ -75,11 +75,11 @@ public:
 
         double dt = (current_time - last_time).toSec(); //sampling period t
 
-        curr_x =  curr_x + vel_lin.x * dt;
+        curr_x = curr_x + (vel_lin.x*cos(curr_theta) + vel_lin.y*cos(M_PI/2 + curr_theta)) * dt;
         odom_pos.position.x = curr_x;
-        curr_y =  curr_y + vel_lin.y * dt;
+        curr_y = curr_y + (vel_lin.x*sin(curr_theta) + vel_lin.y*sin(M_PI/2 + curr_theta)) * dt;
         odom_pos.position.y = curr_y;
-        odom_pos.position.z = 0; //it's alwyas 0, it moves on a plane
+        odom_pos.position.z = 0; // always 0, the robot moves on a plane
 
         curr_theta = curr_theta + vel_ang.z * dt;
 
@@ -89,7 +89,7 @@ public:
         odom_pos.orientation.y = q.y();
         odom_pos.orientation.z = q.z();
         odom_pos.orientation.w = q.w();
-        
+
         // ROS_INFO("updated pose: (%f, %f, %f)", curr_x, curr_y, curr_theta);
 
         return odom_pos;
