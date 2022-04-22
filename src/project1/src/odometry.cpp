@@ -13,31 +13,32 @@ public:
     Odometry() { //variables in which I have to save initialpose
         last_time = ros::Time::now();
         isFirstPose = false;
-        sub_p = n.subscribe("/robot/pose", 1000, &Odometry::poseCallback, this);
-        // sub_v = n.subscribe("/cmd_vel", 1000, &Odometry::odometryCallback, this);
+        // sub_p = n.subscribe("/robot/pose", 1000, &Odometry::poseCallback, this);
+
+        // Wait for the first message of topic /robot/pose to initialize the pose of the robot
+        geometry_msgs::PoseStamped::ConstPtr initial_pose = ros::topic::waitForMessage<geometry_msgs::PoseStamped>("/robot/pose", n);
+        initializePose(initial_pose);
+
+        sub_v = n.subscribe("/cmd_vel", 1000, &Odometry::odometryCallback, this);
         pub = n.advertise<nav_msgs::Odometry>("/odom", 1000);
     }
 
-    void poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg_p){
-        if(!isFirstPose){
-            curr_x = msg_p->pose.position.x;
-            curr_y = msg_p->pose.position.y;
+    void initializePose(const geometry_msgs::PoseStamped::ConstPtr& msg_p){
+        curr_x = msg_p->pose.position.x;
+        curr_y = msg_p->pose.position.y;
 
-            tf2::Quaternion q(
-                msg_p->pose.orientation.x,
-                msg_p->pose.orientation.y,
-                msg_p->pose.orientation.z,
-                msg_p->pose.orientation.w);
-            tf2::Matrix3x3 m(q);
-            double roll, pitch, yaw;
-            m.getRPY(roll, pitch, yaw);
+        tf2::Quaternion q(
+            msg_p->pose.orientation.x,
+            msg_p->pose.orientation.y,
+            msg_p->pose.orientation.z,
+            msg_p->pose.orientation.w);
+        tf2::Matrix3x3 m(q);
+        double roll, pitch, yaw;
+        m.getRPY(roll, pitch, yaw);
 
-            curr_theta = yaw;
-            isFirstPose = true;
-            // ROS_INFO("initial pose: (%f, %f, %f)", curr_x, curr_y, curr_theta);
-
-            sub_v = n.subscribe("/cmd_vel", 1000, &Odometry::odometryCallback, this);
-        }
+        curr_theta = yaw;
+        isFirstPose = true;
+        // ROS_INFO("initial pose: (%f, %f, %f)", curr_x, curr_y, curr_theta);
     }
 
     void odometryCallback(const geometry_msgs::TwistStamped::ConstPtr& msg_v) {
@@ -102,7 +103,6 @@ private:
     ros::Subscriber sub_v;
     ros::Publisher pub;
 
-    bool isFirstPose;
     ros::Time last_time;
 
     double curr_x;

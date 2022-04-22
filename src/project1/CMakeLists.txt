@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(project1)
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp std_msgs geometry_msgs nav_msgs tf tf2 tf2_ros)
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs geometry_msgs nav_msgs tf tf2 tf2_ros dynamic_reconfigure)
 
 ## Declare a catkin package
 #  catkin_package(
@@ -11,6 +11,10 @@ find_package(catkin REQUIRED COMPONENTS roscpp std_msgs geometry_msgs nav_msgs t
 #  CATKIN_DEPENDS roscpp std_msgs
 #  DEPENDS system_lib
 #)
+
+generate_dynamic_reconfigure_options(
+    cfg/parameters.cfg  
+)
 
 catkin_package( CATKIN_DEPENDS
     roscpp
@@ -28,13 +32,13 @@ add_dependencies(velocity ${catkin_EXPORTED_TARGETS} project1_generate_messages)
 target_link_libraries(velocity ${catkin_LIBRARIES})
 
 add_executable(odometry src/odometry.cpp)
-add_dependencies(odometry ${catkin_EXPORTED_TARGETS} project1_generate_messages)
+# add_dependencies(odometry ${catkin_EXPORTED_TARGETS} project1_generate_messages)
 target_link_libraries(odometry ${catkin_LIBRARIES})
 
 add_executable(tf2broadcaster src/tf2broadcaster.cpp)
-add_dependencies(tf2broadcaster ${catkin_EXPORTED_TARGETS} project1_generate_messages)
+# add_dependencies(tf2broadcaster ${catkin_EXPORTED_TARGETS} project1_generate_messages)
 target_link_libraries(tf2broadcaster ${catkin_LIBRARIES})
 
 add_executable(tf2bag src/tf2bag.cpp)
-add_dependencies(tf2bag ${catkin_EXPORTED_TARGETS} project1_generate_messages)
+# add_dependencies(tf2bag ${catkin_EXPORTED_TARGETS} project1_generate_messages)
 target_link_libraries(tf2bag ${catkin_LIBRARIES})

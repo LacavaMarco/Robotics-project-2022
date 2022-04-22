@@ -2,6 +2,8 @@
 #include <sensor_msgs/JointState.h>
 #include <geometry_msgs/TransformStamped.h>
 #include <geometry_msgs/TwistStamped.h>
+#include <dynamic_reconfigure/server.h>
+#include <project1/parametersConfig.h>
 
 #include <array>
 #include <math.h>
@@ -22,6 +24,9 @@ public:
 
         sub = n.subscribe("/wheel_states", 1000, &Velocity::velocityCallback, this);
         pub = n.advertise<geometry_msgs::TwistStamped>("cmd_vel", 1000);
+
+        f = boost::bind(&Velocity::param_callback, this, _1, _2);
+        dynServer.setCallback(f);
     }
 
     // Receive the wheel_states message and for each wheel given the position in ticks,
@@ -118,11 +123,20 @@ public:
     	return v3;
     }
 
+    // Radius calibration with dynamic_reconfigure (WIP)
+    void param_callback(project1::parametersConfig &config, uint32_t level) {
+        ROS_INFO("Reconfigure Request: %f - Level %d", config.r, level);
+        r = config.r;
+        inv_H0 = inverseH0(r, l, w);
+    }
+
 private:
     ros::NodeHandle n;
     geometry_msgs::TwistStamped robot_velocity;
     ros::Subscriber sub;
     ros::Publisher pub;
+    dynamic_reconfigure::Server<project1::parametersConfig> dynServer;
+    dynamic_reconfigure::Server<project1::parametersConfig>::CallbackType f;
 
     double r;
     double l;
@@ -139,6 +153,12 @@ private:
 int main(int argc, char **argv) {
     ros::init(argc, argv, "velocity_estimator");
     Velocity velocity;
+
+    // dynamic_reconfigure::Server<project1::parametersConfig> dynServer;
+    // dynamic_reconfigure::Server<project1::parametersConfig>::CallbackType f;
+    // f = boost::bind(&velocity.param_callback, &velocity.r, _1);
+    // dynServer.setCallback(f);
+
     ros::spin();
     return 0;
 }
