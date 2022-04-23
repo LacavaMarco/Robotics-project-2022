@@ -30,9 +30,9 @@ public:
     }
 
     // Receive the wheel_states message and for each wheel given the position in ticks,
-    // retrieve the wheel velocities in m/s (or rad/s). Then by applying the inverse formula of
+    // compute the wheel velocity in or rad/s. Then by applying the inverse formula of
     // the kinematic model of the mobile robot with four mecanum wheels, compute robot linear
-    // and angular speed and publish them on cmd_vel by using pub.publish()
+    // and angular speed and publish them on cmd_vel
     void velocityCallback(const sensor_msgs::JointState::ConstPtr& msg){
         // Ticks are stored in the array position [fl, fr, rl, rr] and they incrementally
         // increase every timestep: to compute each wheel angular velocity I need to divide the difference
@@ -51,9 +51,6 @@ public:
         // for(int i = 0; i < 4; i++) {
         //     ROS_INFO ("dticks[%d] = %d", i, dticks[i]);
         // }
-
-        // ROS_INFO ("cpr = %d", cpr);
-        // ROS_INFO ("gear_ratio = %d", gear_ratio);
 
         std::array<double, 4> wheels_angular_vel = {{0.0, 0.0, 0.0, 0.0}};
         for(int i = 0; i < 4; i++) {
@@ -123,9 +120,12 @@ public:
     	return v3;
     }
 
-    // Radius calibration with dynamic_reconfigure (WIP)
+    // Radius calibration with dynamic_reconfigure (WIP: since the radius is also used by control node,
+    // probably is better to update the /wheels/r parameter with n.setParam() and to call n.getParam()
+    // in the callback function -> computationally complex since in control node I should recompute H(0)
+    // in the callback function(?))
     void param_callback(project1::parametersConfig &config, uint32_t level) {
-        ROS_INFO("Reconfigure Request: %f - Level %d", config.r, level);
+        // ROS_INFO("Reconfigure Request: %f - Level %d", config.r, level);
         r = config.r;
         inv_H0 = inverseH0(r, l, w);
     }

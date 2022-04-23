@@ -3,6 +3,13 @@
     <node pkg="project1" type="odometry" name="odometry_calculator" output="screen"/>
     <node pkg="project1" type="tf2broadcaster" name="odometry_broadcaster" output="screen"/>
     <node pkg="project1" type="tf2bag" name="bag_broadcaster" output="screen"/>
+    <node pkg="project1" type="control" name="control_evaluator" output="screen"/>
+
+    <!-- In order to resolve any issues with startup order, it is important that the
+    /use_sim_time Parameter is set to true in any launch files using a Clock Server.
+    If you are playing back a bag file with rosbag play, using the '-''-'clock option will 
+    run a Clock Server while the bag file is being played. [wiki.ros.org]  -->
+    <param name="/use_sim_time" value="true"/>
 
     <!-- wheel parameters (probably we will need to differentiate between wheels radius in order to calibrate the odometry) -->
     <param name="wheels/r" value="0.07"/>

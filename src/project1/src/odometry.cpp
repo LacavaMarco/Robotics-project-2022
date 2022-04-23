@@ -12,7 +12,6 @@ class Odometry {
 public:
     Odometry() { //variables in which I have to save initialpose
         last_time = ros::Time::now();
-        isFirstPose = false;
         // sub_p = n.subscribe("/robot/pose", 1000, &Odometry::poseCallback, this);
 
         // Wait for the first message of topic /robot/pose to initialize the pose of the robot
@@ -23,6 +22,8 @@ public:
         pub = n.advertise<nav_msgs::Odometry>("/odom", 1000);
     }
 
+    // Initialize pose with the values of the first message of /robot/pose topic
+    // Could be used also to reset the pose when implementing the service
     void initializePose(const geometry_msgs::PoseStamped::ConstPtr& msg_p){
         curr_x = msg_p->pose.position.x;
         curr_y = msg_p->pose.position.y;
@@ -37,21 +38,16 @@ public:
         m.getRPY(roll, pitch, yaw);
 
         curr_theta = yaw;
-        isFirstPose = true;
         // ROS_INFO("initial pose: (%f, %f, %f)", curr_x, curr_y, curr_theta);
     }
 
+    // Receive the robot linear and angular velocities and compute the robot odometry by
+    // applying Euler or Runge-Kutta integration method (chosen using dynamic reconfigure),
+    // then publish the odometry on topic odom
     void odometryCallback(const geometry_msgs::TwistStamped::ConstPtr& msg_v) {
         ros::Time current_time = msg_v->header.stamp;
-        //get dei parametri della pose attuale,
-        //che ho settato con l'odometryCallback di prima.
         robot_odometry.header.frame_id = "odom";
         robot_odometry.header.stamp = msg_v->header.stamp;
-
-        //If the current time is not the first (so if it is not 0), I compute the
-        //odometry. If it is the first then I do nothing and I store the value in
-        //a last_time variable, which contains the previous time and is updated at
-        //the end of every cycle.
 
         robot_odometry.pose.pose = computeEulerOdometry(msg_v->twist.linear,
                                                 msg_v->twist.angular,
@@ -66,7 +62,7 @@ public:
         last_time = current_time;
     }
 
-    // Basic Euler odometry. Needs to be updated once I learn how to use quaternions.
+    // Euler integration method
     geometry_msgs::Pose computeEulerOdometry(geometry_msgs::Vector3 vel_lin,
                                             geometry_msgs::Vector3 vel_ang,
                                             ros::Time current_time,
