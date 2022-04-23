@@ -32,7 +32,8 @@ generate_messages(
 )
 
 generate_dynamic_reconfigure_options(
-    cfg/parameters.cfg
+    cfg/velParameters.cfg
+    cfg/odomParameters.cfg
 )
 
 catkin_package( CATKIN_DEPENDS
@@ -52,7 +53,7 @@ add_dependencies(velocity ${catkin_EXPORTED_TARGETS} project1_generate_messages)
 target_link_libraries(velocity ${catkin_LIBRARIES})
 
 add_executable(odometry src/odometry.cpp)
-# add_dependencies(odometry ${catkin_EXPORTED_TARGETS} project1_generate_messages)
+add_dependencies(odometry ${catkin_EXPORTED_TARGETS} project1_generate_messages)
 target_link_libraries(odometry ${catkin_LIBRARIES})
 
 add_executable(tf2broadcaster src/tf2broadcaster.cpp)

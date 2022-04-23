@@ -3,7 +3,7 @@
 #include <geometry_msgs/TransformStamped.h>
 #include <geometry_msgs/TwistStamped.h>
 #include <dynamic_reconfigure/server.h>
-#include <project1/parametersConfig.h>
+#include <project1/velParametersConfig.h>
 
 #include <array>
 #include <math.h>
@@ -120,13 +120,14 @@ public:
     	return v3;
     }
 
-    // Radius calibration with dynamic_reconfigure (WIP: since the radius is also used by control node,
-    // probably is better to update the /wheels/r parameter with n.setParam() and to call n.getParam()
-    // in the callback function -> computationally complex since in control node I should recompute H(0)
-    // in the callback function(?))
-    void param_callback(project1::parametersConfig &config, uint32_t level) {
-        // ROS_INFO("Reconfigure Request: %f - Level %d", config.r, level);
-        r = config.r;
+    // Radius and cpr dynamic_reconfigure is used only for calibration purposes:
+    // notice that once that the calibrated values will be chosen, they will be
+    // directly assigned in the launch file
+    void param_callback(project1::velParametersConfig &config, uint32_t level) {
+        // ROS_INFO("Reconfigure Request: %f, %d - Level %d", config.radius, config.cpr, level);
+        // r = 0.08, cpr = 43
+        r = config.radius;
+        cpr = config.cpr;
         inv_H0 = inverseH0(r, l, w);
     }
 
@@ -135,8 +136,8 @@ private:
     geometry_msgs::TwistStamped robot_velocity;
     ros::Subscriber sub;
     ros::Publisher pub;
-    dynamic_reconfigure::Server<project1::parametersConfig> dynServer;
-    dynamic_reconfigure::Server<project1::parametersConfig>::CallbackType f;
+    dynamic_reconfigure::Server<project1::velParametersConfig> dynServer;
+    dynamic_reconfigure::Server<project1::velParametersConfig>::CallbackType f;
 
     double r;
     double l;
@@ -153,12 +154,6 @@ private:
 int main(int argc, char **argv) {
     ros::init(argc, argv, "velocity_estimator");
     Velocity velocity;
-
-    // dynamic_reconfigure::Server<project1::parametersConfig> dynServer;
-    // dynamic_reconfigure::Server<project1::parametersConfig>::CallbackType f;
-    // f = boost::bind(&velocity.param_callback, &velocity.r, _1);
-    // dynServer.setCallback(f);
-
     ros::spin();
     return 0;
 }
