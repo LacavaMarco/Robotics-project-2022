@@ -4,6 +4,7 @@
     <node pkg="project1" type="tf2broadcaster" name="odometry_broadcaster" output="screen"/>
     <node pkg="project1" type="tf2bag" name="bag_broadcaster" output="screen"/>
     <node pkg="project1" type="control" name="control_evaluator" output="screen"/>
+    <node pkg="project1" type="reset_client" name="reset_client" output="screen"/>
 
     <!-- In order to resolve any issues with startup order, it is important that the
     /use_sim_time Parameter is set to true in any launch files using a Clock Server.

@@ -26,9 +26,15 @@ add_message_files(
     WheelsVector4.msg
 )
 
+add_service_files(
+    FILES
+    Reset.srv
+)
+
 generate_messages(
     DEPENDENCIES
-    std_msgs # both Header and float64 of WheelsVector4 message are defined in std_msgs
+    std_msgs ## both Header and float64 of WheelsVector4 message are defined in std_msgs
+    geometry_msgs
 )
 
 generate_dynamic_reconfigure_options(
@@ -36,7 +42,7 @@ generate_dynamic_reconfigure_options(
     cfg/odomParameters.cfg
 )
 
-catkin_package( CATKIN_DEPENDS
+catkin_package(CATKIN_DEPENDS
     roscpp
     std_msgs
     geometry_msgs
@@ -67,3 +73,7 @@ target_link_libraries(tf2bag ${catkin_LIBRARIES})
 add_executable(control src/control.cpp)
 add_dependencies(control ${catkin_EXPORTED_TARGETS} project1_generate_messages)
 target_link_libraries(control ${catkin_LIBRARIES})
+
+add_executable(reset_client src/client.cpp)
+add_dependencies(reset_client ${catkin_EXPORTED_TARGETS} project1_generate_messages)
+target_link_libraries(reset_client ${catkin_LIBRARIES})

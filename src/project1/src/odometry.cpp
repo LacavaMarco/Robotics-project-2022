@@ -6,7 +6,7 @@
 #include <geometry_msgs/TwistStamped.h>
 #include <dynamic_reconfigure/server.h>
 #include <project1/odomParametersConfig.h>
-
+#include <project1/Reset.h>
 #include <array>
 
 class Odometry {
@@ -22,6 +22,8 @@ public:
 
         f = boost::bind(&Odometry::param_callback, this, _1, _2);
         dynServer.setCallback(f);
+
+        server = n.advertiseService<project1::Reset::Request, project1::Reset::Response>("reset", boost::bind(&Odometry::reset_callback, this, _1, _2));
     }
 
     // Initialize pose with the values of the first message of /robot/pose topic
@@ -121,14 +123,29 @@ public:
         int_method = config.int_method;
     }
 
+    bool reset_callback(project1::Reset::Request req, project1::Reset::Response res){
+        res.old_pose.position = robot_odometry.pose.pose.position;
+        res.old_pose.orientation = robot_odometry.pose.pose.orientation;
+        robot_odometry.pose.pose.position = req.new_pose.position;
+        robot_odometry.pose.pose.orientation = req.new_pose.orientation;
+
+        ROS_INFO("Request to reset pose to X:%f Y:%f - Responding with old pose: X:%f Y:%f",
+            (double) req.new_pose.position.x, (double) req.new_pose.position.y, (double)res.old_pose.position.x,
+            (double)res.old_pose.position.y);
+        return true;
+    }
+
 private:
     ros::NodeHandle n;
     nav_msgs::Odometry robot_odometry;
     ros::Subscriber sub_p;
     ros::Subscriber sub_v;
     ros::Publisher pub;
+
     dynamic_reconfigure::Server<project1::odomParametersConfig> dynServer;
     dynamic_reconfigure::Server<project1::odomParametersConfig>::CallbackType f;
+
+    ros::ServiceServer server;
 
     int int_method;
     ros::Time last_time;
