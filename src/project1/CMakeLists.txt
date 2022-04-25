@@ -28,7 +28,7 @@ add_message_files(
 
 add_service_files(
     FILES
-    Reset.srv
+    ResetPose.srv
 )
 
 generate_messages(
