@@ -13,7 +13,7 @@ public:
     void callback(const geometry_msgs::PoseStamped::ConstPtr& msg){
         // set header
         transformStamped.header.stamp = ros::Time::now();
-        transformStamped.header.frame_id = "odom";
+        transformStamped.header.frame_id = "map";
         transformStamped.child_frame_id = "bag";
         // set x,y
         transformStamped.transform.translation.x = msg->pose.position.x;

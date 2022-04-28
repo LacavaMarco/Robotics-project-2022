@@ -9,6 +9,7 @@
 #include "project1/ResetPose.h"
 
 #include <array>
+#include <math.h>
 
 class Odometry {
 
@@ -24,30 +25,12 @@ public:
 
         server = n.advertiseService<project1::ResetPose::Request,
                                     project1::ResetPose::Response>("reset_pose",
-                                                                    boost::bind(&Odometry::reset_callback,
+                                                                    boost::bind(&Odometry::resetCallback,
                                                                     this, _1, _2));
 
         sub_v = n.subscribe("/cmd_vel", 1000, &Odometry::odometryCallback, this);
-        pub = n.advertise<nav_msgs::Odometry>("/odom", 1000);
-    }
-
-    // Initialize pose with the values of the first message of /robot/pose topic
-    // Could be used also to reset the pose when implementing the service (?)
-    void initializePose(const geometry_msgs::PoseStamped::ConstPtr& msg_p){
-        curr_x = msg_p->pose.position.x;
-        curr_y = msg_p->pose.position.y;
-
-        tf2::Quaternion q(
-            msg_p->pose.orientation.x,
-            msg_p->pose.orientation.y,
-            msg_p->pose.orientation.z,
-            msg_p->pose.orientation.w);
-        tf2::Matrix3x3 m(q);
-        double roll, pitch, yaw;
-        m.getRPY(roll, pitch, yaw);
-
-        curr_theta = yaw;
-        // ROS_INFO("initial pose: (%f, %f, %f)", curr_x, curr_y, curr_theta);
+        pub_o = n.advertise<nav_msgs::Odometry>("/odom", 1000);
+        pub_reset = n.advertise<geometry_msgs::Vector3>("/reset_pose", 1000);
     }
 
     // Receive the robot linear and angular velocities and compute the robot odometry by
@@ -58,7 +41,15 @@ public:
             // Wait for the first message of topic /robot/pose to initialize the pose of the robot
             if(resetInitialPose) {
                 geometry_msgs::PoseStamped::ConstPtr initial_pose = ros::topic::waitForMessage<geometry_msgs::PoseStamped>("/robot/pose", n);
-                initializePose(initial_pose);
+                tf2::Quaternion q(
+                    initial_pose->pose.orientation.x,
+                    initial_pose->pose.orientation.y,
+                    initial_pose->pose.orientation.z,
+                    initial_pose->pose.orientation.w);
+                tf2::Matrix3x3 m(q);
+                double roll, pitch, yaw;
+                m.getRPY(roll, pitch, yaw);
+                resetPose(initial_pose->pose.position.x, initial_pose->pose.position.y, yaw);
             }
             last_time = msg_v->header.stamp; // first dt will be 0 (minor inconvenince)
             getInitialPose = false;
@@ -79,7 +70,7 @@ public:
         robot_odometry.twist.twist.linear = msg_v->twist.linear;
         robot_odometry.twist.twist.angular = msg_v->twist.angular;
 
-        pub.publish(robot_odometry);
+        pub_o.publish(robot_odometry);
 
         last_time = current_time;
     }
@@ -131,71 +122,66 @@ public:
         int_method = config.int_method;
     }
 
-    bool reset_callback(project1::ResetPose::Request &req, project1::ResetPose::Response &res){
-        res.old_x = robot_odometry.pose.pose.position.x;
-        res.old_y = robot_odometry.pose.pose.position.y;
-
-        tf2::Quaternion q(
-            robot_odometry.pose.pose.orientation.x,
-            robot_odometry.pose.pose.orientation.y,
-            robot_odometry.pose.pose.orientation.z,
-            robot_odometry.pose.pose.orientation.w);
-        tf2::Matrix3x3 m(q);
-        double roll, pitch, yaw;
-        m.getRPY(roll, pitch, yaw);
-        res.old_theta = yaw;
-
-        curr_x = req.new_x;
-        curr_y = req.new_y;
-        curr_theta = req.new_theta;
-
-        robot_odometry.header.frame_id = "odom";
-        robot_odometry.header.stamp = last_time;
-
-        robot_odometry.pose.pose.position.x = curr_x;
-        robot_odometry.pose.pose.position.y = curr_y;
-        robot_odometry.pose.pose.position.z = 0;
-
-        tf2::Quaternion p;
-        p.setRPY(0, 0, curr_theta);
-        robot_odometry.pose.pose.orientation.x = p.x();
-        robot_odometry.pose.pose.orientation.y = p.y();
-        robot_odometry.pose.pose.orientation.z = p.z();
-        robot_odometry.pose.pose.orientation.w = p.w();
-
-        pub.publish(robot_odometry);
-
+    // Receive the service request to update robot position
+    bool resetCallback(project1::ResetPose::Request &req, project1::ResetPose::Response &res){
+        resetPose(req.new_x, req.new_y, req.new_theta);
         // If reset_pose service is called before the bag is played,
         // the initial pose of the robot must not be updated
         resetInitialPose = false;
 
-        // ROS_INFO("Reset pose from (X: %f, Y: %f, Theta: %f) to (X: %f, Y: %f, Theta: %f)",
-        //             (double) req.new_x, (double) req.new_y, (double) req.new_theta,
-        //             (double) res.old_x, (double) res.old_y, (double) res.old_theta);
+        // res.old_x = robot_odometry.pose.pose.position.x;
+        // res.old_y = robot_odometry.pose.pose.position.y;
+        //
+        // tf2::Quaternion q(
+        //     robot_odometry.pose.pose.orientation.x,
+        //     robot_odometry.pose.pose.orientation.y,
+        //     robot_odometry.pose.pose.orientation.z,
+        //     robot_odometry.pose.pose.orientation.w);
+        // tf2::Matrix3x3 m(q);
+        // double roll, pitch, yaw;
+        // m.getRPY(roll, pitch, yaw);
+        // res.old_theta = yaw;
+
+        // ROS_INFO("Reset pose from (%f, %f, %f) to (%f, %f, %f)",
+        //             (double) res.old_x, (double) res.old_y, (double) res.old_theta,
+        //             (double) req.new_x, (double) req.new_y, (double) req.new_theta);
         return true;
+    }
+    // Publish a message to topic /reset_pose (to reset frame "odom" position wrt "map" in tf2broadcaster),
+    // then set curr_x, curr_y and curr_theta to 0 (used both by initialize and to reset robot position)
+    void resetPose(float x, float y, float theta) {
+        auto reset_v3 = geometry_msgs::Vector3();
+    	reset_v3.x = x;
+    	reset_v3.y = y;
+    	reset_v3.z = theta;
+        pub_reset.publish(reset_v3);
+
+        curr_x = 0.0;
+        curr_y = 0.0;
+        curr_theta = 0.0;
     }
 
 private:
     ros::NodeHandle n;
     nav_msgs::Odometry robot_odometry;
-    ros::Subscriber sub_p;
     ros::Subscriber sub_v;
-    ros::Publisher pub;
+    ros::Publisher pub_o;
+    ros::Publisher pub_reset;
 
     dynamic_reconfigure::Server<project1::odomParametersConfig> dynServer;
     dynamic_reconfigure::Server<project1::odomParametersConfig>::CallbackType f;
 
     ros::ServiceServer server;
 
+    // define the integration method chosen by the user (default: Euler)
     int int_method;
     ros::Time last_time;
+    // true if the initial message of /robot/pose must be read in order to set "odom" wrt "map" (when a bag is played)
     bool getInitialPose;
     // true if the service /reset_pose is called before a bag is played (no need to update the initial pose again)
     bool resetInitialPose;
 
-    double curr_x;
-    double curr_y;
-    double curr_theta;
+    double curr_x, curr_y, curr_theta;
 };
 
 int main(int argc, char **argv) {
