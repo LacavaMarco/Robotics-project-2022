@@ -53,7 +53,6 @@ public:
             }
             last_time = msg_v->header.stamp; // first dt will be 0 (minor inconvenince)
             getInitialPose = false;
-            resetInitialPose = true;
         }
 
         ros::Time current_time = msg_v->header.stamp;
@@ -115,10 +114,7 @@ public:
     }
 
     void param_callback(project1::odomParametersConfig &config, uint32_t level) {
-        // ROS_INFO("Reconfigure Request: %s, %d - Level %d", config.getInitialPose? "True" : "False", config.int_method, level);
-        // Before playing another bag, in order to let the initial robot
-        // pose be read, I need to set getInitialPose back to true
-        getInitialPose = config.getInitialPose;
+        // ROS_INFO("Reconfigure Request: %d - Level %d", config.int_method, level);
         int_method = config.int_method;
     }
 
@@ -128,6 +124,8 @@ public:
         // If reset_pose service is called before the bag is played,
         // the initial pose of the robot must not be updated
         resetInitialPose = false;
+        // But I need to save the first header timestamp anyway
+        getInitialPose = true;
 
         // res.old_x = robot_odometry.pose.pose.position.x;
         // res.old_y = robot_odometry.pose.pose.position.y;
