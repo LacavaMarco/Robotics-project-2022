@@ -1,0 +1,23 @@
+10565431 Marco Lacava
+10675881 Lorenzo Aicardi
+
+The archive contains the package project1 folder containing all the necessary source code.
+
+The nodes used are velocity (compute the robot velocity from the bag data), odometry (compute the robot odometry), tf2broadcaster (update the tranformation frames), tf2bag (used to visualize the position registered by OptiTrack) and control (compute wheels velocity from cmd_vel robot velocity and compare them with recorded encoder values).
+
+The parameters defined in the launch file are wheels r, l, w, cpr and gear ratio given in the slides and accordingly calibrated, parameter "use_sim_time" was included and set to true to synchronize the data of bags and the data computed by the nodes in order to correctly visualize it using rqt_plot.
+The parameters contained in cfg folders are used in node velocity and odometry: velParameters contains radius and cpr that were used in the calibration phase to dynamically reconfigure wheels radius and cpr without relaunching the whole package; odomParameters contains int_method that defines the integration method chosen by the user with dynamic reconfigure.
+
+The structure of the tf tree is: map(bag, odom(base_link)). The inclusion of bag was to visualize the differences between Optitrack registered positions and the computed ones.
+
+The only custom message used is WheelsVector4: 
+	Header header
+	float64 rpm_fl
+	float64 rpm_fr
+	float64 rpm_rr
+	float64 rpm_rl
+
+To start the nodes, it is sufficient to execute the command "roslaunch project1 project1.launch". Client node is used to handle service requests to reset the odometry of the robot to a given pose (called with command "rosservice /resetpose new_x new_y new_theta").
+To change the integration method, use the command "rosrun rqt_reconfigure rqt_reconfigure" (in the GUI there will also be the possibility to calibrate the radius and cpr).
+To correctly visualize the bag velocities with rqt_plot and plotjuggler, the bags must be played with the --clock command.
+The parameters calibration (wheels radius and cpr) was done manually by using dynamic reconfigure on radius and cpr parameters so that there was no need to recompile the code, kill any node or relaunch the package. Excluding the first time a bag is played, before playing a bag it is necessary to call service resetpose to set the pose of the robot to the first pose provided by the bag (bag1: 0.008653 0.004113 -0.028451, bag2: 0.024222 0.003743 -0.009419, bag3: 0.005460 0.039970 -0.012990).

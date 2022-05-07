@@ -12,8 +12,8 @@
     run a Clock Server while the bag file is being played. [wiki.ros.org]  -->
     <param name="/use_sim_time" value="true"/>
 
-    <!-- wheel parameters (probably we will need to differentiate between wheels radius in order to calibrate the odometry) -->
-    <param name="wheels_r" value="0.078"/>
+    <!-- wheel parameters -->
+    <param name="wheels_r" value="0.0795"/>
     <param name="wheels_l" value="0.200"/>
     <param name="wheels_w" value="0.169"/>
     <!-- Gear ratio (wheel - motor) -->

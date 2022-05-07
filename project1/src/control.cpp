@@ -7,7 +7,7 @@
 #include <array>
 #include <math.h>
 
-// To check if the results match, use rqt_plot (the bag must be played with the --clock option)
+// To check if the results match, use rqt_plot or plotjuggler (the bag must be played with the --clock option)
 class Control {
 
 public:

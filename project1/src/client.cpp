@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
     ros::ServiceClient client = n.serviceClient<project1::ResetPose>("resetpose");
     project1::ResetPose srv;
 
-    //Reset pose have argv[1] = new x, argv[2] = new y, argv[3] = new theta
+    // Reset pose has argv[1] = new x, argv[2] = new y, argv[3] = new theta
     srv.request.new_x = atof(argv[1]);
     srv.request.new_y = atof(argv[2]);
     srv.request.new_theta = atof(argv[3]);

@@ -34,7 +34,7 @@ public:
     // the kinematic model of the mobile robot with four mecanum wheels, compute robot linear
     // and angular speed and publish them on cmd_vel
     void velocityCallback(const sensor_msgs::JointState::ConstPtr& msg){
-        // Ticks are stored in the array position [fl, fr, rl, rr] and they incrementally
+        // Ticks are stored in the array position [fl, fr, rl, rr] and they
         // increase every timestep: to compute each wheel angular velocity I need to divide the difference
         // between current and previous ticks by the difference between current and previous time stamp (?)
         ros::Time current_time = msg->header.stamp;
@@ -80,7 +80,7 @@ public:
     // Compute robot linear and angular velocity from wheel angular velocities
     std::array<double, 3> computeRobotVelocity(std::array<double, 4> wheels_angular_vel) {
         std::array<double, 3> robot_vel = {{0.0, 0.0, 0.0}};
-        // The data retrieved from the bag has the wheels in the order fl, fr, rl, rr, while the
+        // The data retrieved from the bag considers the wheels in the order fl, fr, rl, rr, while the
         // mecanum wheels formula used to compute the robot velocity has the wheels in the order fl, fr, rr, rl
         std::array<double, 4> wheels_ordered_vel = {{wheels_angular_vel[0], wheels_angular_vel[1],
                                                     wheels_angular_vel[3], wheels_angular_vel[2]}};
@@ -125,7 +125,6 @@ public:
     // directly assigned in the launch file
     void param_callback(project1::velParametersConfig &config, uint32_t level) {
         // ROS_INFO("Reconfigure Request: %f, %d - Level %d", config.radius, config.cpr, level);
-        // r = 0.08, cpr = 43
         r = config.radius;
         cpr = config.cpr;
         inv_H0 = inverseH0(r, l, w);

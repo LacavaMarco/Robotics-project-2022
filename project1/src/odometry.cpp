@@ -87,10 +87,12 @@ public:
         // ROS_INFO("dt = %f", dt);
 
         if(integration_method == 0) { // Euler
+            // ROS_INFO("Euler");
             curr_x = curr_x + (vel_lin.x*cos(curr_theta) + vel_lin.y*cos(M_PI/2 + curr_theta)) * dt;
             curr_y = curr_y + (vel_lin.x*sin(curr_theta) + vel_lin.y*sin(M_PI/2 + curr_theta)) * dt;
         }
         else { // Runge-Kutta
+            // ROS_INFO("RK");
             curr_x = curr_x + (vel_lin.x*cos(curr_theta + vel_ang.z*dt/2) + vel_lin.y*cos(M_PI/2 + curr_theta + vel_ang.z*dt/2)) * dt;
             curr_y = curr_y + (vel_lin.x*sin(curr_theta + vel_ang.z*dt/2) + vel_lin.y*sin(M_PI/2 + curr_theta + vel_ang.z*dt/2)) * dt;
         }
@@ -176,7 +178,7 @@ private:
     ros::Time last_time;
     // true if the initial message of /robot/pose must be read in order to set "odom" wrt "map" (when a bag is played)
     bool getInitialPose;
-    // true if the service /reset_pose is called before a bag is played (no need to update the initial pose again)
+    // false if the service /reset_pose is called before a bag is played (no need to update the initial pose again)
     bool resetInitialPose;
 
     double curr_x, curr_y, curr_theta;
