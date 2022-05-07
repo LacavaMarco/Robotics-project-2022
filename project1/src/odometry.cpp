@@ -40,16 +40,12 @@ public:
         if(getInitialPose) {
             // Wait for the first message of topic /robot/pose to initialize the pose of the robot
             if(resetInitialPose) {
-                geometry_msgs::PoseStamped::ConstPtr initial_pose = ros::topic::waitForMessage<geometry_msgs::PoseStamped>("/robot/pose", n);
-                tf2::Quaternion q(
-                    initial_pose->pose.orientation.x,
-                    initial_pose->pose.orientation.y,
-                    initial_pose->pose.orientation.z,
-                    initial_pose->pose.orientation.w);
-                tf2::Matrix3x3 m(q);
-                double roll, pitch, yaw;
-                m.getRPY(roll, pitch, yaw);
-                resetPose(initial_pose->pose.position.x, initial_pose->pose.position.y, yaw);
+                double init_x, init_y, init_theta;
+                n.getParam("/init/x", init_x);
+                n.getParam("/init/y", init_y);
+                n.getParam("/init/theta", init_theta);
+
+                resetPose(init_x, init_y, init_theta);
             }
             last_time = msg_v->header.stamp; // first dt will be 0 (minor inconvenince)
             getInitialPose = false;
@@ -147,8 +143,9 @@ public:
         //             (double) req.new_x, (double) req.new_y, (double) req.new_theta);
         return true;
     }
+
     // Publish a message to topic /reset_pose (to reset frame "odom" position wrt "map" in tf2broadcaster),
-    // then set curr_x, curr_y and curr_theta to 0 (used both by initialize and to reset robot position)
+    // then set curr_x, curr_y and curr_theta to 0 (the moethod is used both to initialize and to reset robot position)
     void resetPose(float x, float y, float theta) {
         auto reset_v3 = geometry_msgs::Vector3();
         reset_v3.x = x;

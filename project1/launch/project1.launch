@@ -13,12 +13,20 @@
     <param name="/use_sim_time" value="true"/>
 
     <!-- wheel parameters -->
-    <param name="wheels_r" value="0.0795"/>
-    <param name="wheels_l" value="0.200"/>
-    <param name="wheels_w" value="0.169"/>
+    <param name="wheels/r" value="0.0795"/>
+    <param name="wheels/l" value="0.200"/>
+    <param name="wheels/w" value="0.169"/>
     <!-- Gear ratio (wheel - motor) -->
-    <param name="wheels_T" value="5"/>
+    <param name="wheels/T" value="5"/>
     <!-- Encoders resolution [counts (ticks) per revolution] -->
-    <param name="wheels_N" value="43"/>
+    <param name="wheels/N" value="43"/>
+
+    <!-- bag1: 0.008653 0.004113 -0.028451
+         bag2: 0.024222 0.003743 -0.009419
+         bag3: 0.005460 0.039970 -0.012990
+         default: bag1 -->
+    <param name="init/x" value="0.008653"/>
+    <param name="init/y" value="0.004113"/>
+    <param name="init/theta" value="-0.028451"/>
 
 </launch>

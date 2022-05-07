@@ -12,12 +12,12 @@ class Velocity {
 
 public:
     Velocity() {
-        n.getParam("/wheels_r", r); // probably will need 4 different radius instances for each wheel
-        n.getParam("/wheels_l", l);
-        n.getParam("/wheels_w", w);
+        n.getParam("/wheels/r", r);
+        n.getParam("/wheels/l", l);
+        n.getParam("/wheels/w", w);
         inv_H0 = inverseH0(r, l, w);
-        n.getParam("/wheels_N", cpr);
-        n.getParam("/wheels_T", gear_ratio);
+        n.getParam("/wheels/N", cpr);
+        n.getParam("/wheels/T", gear_ratio);
 
         last_ticks = {{0, 0, 0, 0}};
         last_time = ros::Time::now();
