@@ -9,14 +9,14 @@ class TfBroad {
 
 public:
     TfBroad() {
-        sub_reset = n.subscribe("/reset_pose", 1000, &TfBroad::resetCallback, this);
-        sub_o = n.subscribe("/odom", 1000, &TfBroad::odomCallback, this);
+        sub_reset = n.subscribe("reset_pose", 1000, &TfBroad::resetCallback, this);
+        sub_o = n.subscribe("odom", 1000, &TfBroad::odomCallback, this);
     }
 
     // Initialize pose with the values of the first message of /robot/pose topic.
-    // Also used to reset the pose when requested by the service (first updates
+    // Also used to reset the pose when requested by resetpose service: first updates
     // the position of frame "odom" wrt "map", then set the position of "base_link"
-    // in the origin of "odom")
+    // in the origin of "odom"
     void resetCallback(const geometry_msgs::Vector3::ConstPtr& msg_reset) {
         initial_x = msg_reset->x;
         initial_y = msg_reset->y;
@@ -50,10 +50,12 @@ public:
         transformStampedOdom.transform.translation.y = 0.0;
         transformStampedOdom.transform.translation.z = 0.0;
         // set theta
-        transformStampedOdom.transform.rotation.x = 0.0;
-        transformStampedOdom.transform.rotation.y = 0.0;
-        transformStampedOdom.transform.rotation.z = 0.0;
-        transformStampedOdom.transform.rotation.w = 0.0;
+        tf2::Quaternion p;
+        p.setRPY(0, 0, 0);
+        transformStampedPose.transform.rotation.x = p.x();
+        transformStampedPose.transform.rotation.y = p.y();
+        transformStampedPose.transform.rotation.z = p.z();
+        transformStampedPose.transform.rotation.w = p.w();
         // send transform
         odom_br.sendTransform(transformStampedOdom);
     }

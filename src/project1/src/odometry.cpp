@@ -24,13 +24,13 @@ public:
         dynServer.setCallback(f);
 
         server = n.advertiseService<project1::ResetPose::Request,
-                                    project1::ResetPose::Response>("reset_pose",
+                                    project1::ResetPose::Response>("resetpose",
                                                                     boost::bind(&Odometry::resetCallback,
                                                                     this, _1, _2));
 
-        sub_v = n.subscribe("/cmd_vel", 1000, &Odometry::odometryCallback, this);
-        pub_o = n.advertise<nav_msgs::Odometry>("/odom", 1000);
-        pub_reset = n.advertise<geometry_msgs::Vector3>("/reset_pose", 1000);
+        sub_v = n.subscribe("cmd_vel", 1000, &Odometry::odometryCallback, this);
+        pub_o = n.advertise<nav_msgs::Odometry>("odom", 1000);
+        pub_reset = n.advertise<geometry_msgs::Vector3>("reset_pose", 1000);
     }
 
     // Receive the robot linear and angular velocities and compute the robot odometry by
@@ -127,18 +127,18 @@ public:
         // But I need to save the first header timestamp anyway
         getInitialPose = true;
 
-        // res.old_x = robot_odometry.pose.pose.position.x;
-        // res.old_y = robot_odometry.pose.pose.position.y;
-        //
-        // tf2::Quaternion q(
-        //     robot_odometry.pose.pose.orientation.x,
-        //     robot_odometry.pose.pose.orientation.y,
-        //     robot_odometry.pose.pose.orientation.z,
-        //     robot_odometry.pose.pose.orientation.w);
-        // tf2::Matrix3x3 m(q);
-        // double roll, pitch, yaw;
-        // m.getRPY(roll, pitch, yaw);
-        // res.old_theta = yaw;
+        res.old_x = robot_odometry.pose.pose.position.x;
+        res.old_y = robot_odometry.pose.pose.position.y;
+
+        tf2::Quaternion q(
+            robot_odometry.pose.pose.orientation.x,
+            robot_odometry.pose.pose.orientation.y,
+            robot_odometry.pose.pose.orientation.z,
+            robot_odometry.pose.pose.orientation.w);
+        tf2::Matrix3x3 m(q);
+        double roll, pitch, yaw;
+        m.getRPY(roll, pitch, yaw);
+        res.old_theta = yaw;
 
         // ROS_INFO("Reset pose from (%f, %f, %f) to (%f, %f, %f)",
         //             (double) res.old_x, (double) res.old_y, (double) res.old_theta,
@@ -149,9 +149,9 @@ public:
     // then set curr_x, curr_y and curr_theta to 0 (used both by initialize and to reset robot position)
     void resetPose(float x, float y, float theta) {
         auto reset_v3 = geometry_msgs::Vector3();
-    	reset_v3.x = x;
-    	reset_v3.y = y;
-    	reset_v3.z = theta;
+        reset_v3.x = x;
+        reset_v3.y = y;
+        reset_v3.z = theta;
         pub_reset.publish(reset_v3);
 
         curr_x = 0.0;

@@ -12,17 +12,17 @@ class Velocity {
 
 public:
     Velocity() {
-        n.getParam("/wheels/r", r); // probably will need 4 different radius instances for each wheel
-        n.getParam("/wheels/l", l);
-        n.getParam("/wheels/w", w);
+        n.getParam("/wheels_r", r); // probably will need 4 different radius instances for each wheel
+        n.getParam("/wheels_l", l);
+        n.getParam("/wheels_w", w);
         inv_H0 = inverseH0(r, l, w);
-        n.getParam("/wheels/N", cpr);
-        n.getParam("/wheels/T", gear_ratio);
+        n.getParam("/wheels_N", cpr);
+        n.getParam("/wheels_T", gear_ratio);
 
         last_ticks = {{0, 0, 0, 0}};
         last_time = ros::Time::now();
 
-        sub = n.subscribe("/wheel_states", 1000, &Velocity::velocityCallback, this);
+        sub = n.subscribe("wheel_states", 1000, &Velocity::velocityCallback, this);
         pub = n.advertise<geometry_msgs::TwistStamped>("cmd_vel", 1000);
 
         f = boost::bind(&Velocity::param_callback, this, _1, _2);

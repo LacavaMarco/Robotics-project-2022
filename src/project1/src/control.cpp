@@ -12,13 +12,13 @@ class Control {
 
 public:
     Control() {
-        n.getParam("/wheels/r", r);
-        n.getParam("/wheels/l", l);
-        n.getParam("/wheels/w", w);
+        n.getParam("/wheels_r", r);
+        n.getParam("/wheels_l", l);
+        n.getParam("/wheels_w", w);
         h0 = computeH0(r, l, w);
 
-        sub = n.subscribe("/cmd_vel", 1000, &Control::controlCallback, this);
-        pub = n.advertise<project1::WheelsVector4>("/wheels_rpm", 1000); // The actual unit of measure is rad/min
+        sub = n.subscribe("cmd_vel", 1000, &Control::controlCallback, this);
+        pub = n.advertise<project1::WheelsVector4>("wheels_rpm", 1000); // The actual unit of measure is rad/min
     }
 
     // Receive the cmd_vel message and for each wheel compute the velocity in rpm given

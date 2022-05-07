@@ -13,12 +13,12 @@
     <param name="/use_sim_time" value="true"/>
 
     <!-- wheel parameters (probably we will need to differentiate between wheels radius in order to calibrate the odometry) -->
-    <param name="wheels/r" value="0.07"/>
-    <param name="wheels/l" value="0.200"/>
-    <param name="wheels/w" value="0.169"/>
+    <param name="wheels_r" value="0.078"/>
+    <param name="wheels_l" value="0.200"/>
+    <param name="wheels_w" value="0.169"/>
     <!-- Gear ratio (wheel - motor) -->
-    <param name="wheels/T" value="5"/>
+    <param name="wheels_T" value="5"/>
     <!-- Encoders resolution [counts (ticks) per revolution] -->
-    <param name="wheels/N" value="42"/>
+    <param name="wheels_N" value="43"/>
 
 </launch>

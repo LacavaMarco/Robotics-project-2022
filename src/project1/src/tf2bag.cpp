@@ -7,7 +7,7 @@ class TfBag {
 
 public:
     TfBag() {
-        sub = n.subscribe("/robot/pose", 1000, &TfBag::callback, this);
+        sub = n.subscribe("robot/pose", 1000, &TfBag::callback, this);
     }
 
     void callback(const geometry_msgs::PoseStamped::ConstPtr& msg){
