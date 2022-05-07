@@ -4,7 +4,7 @@
 #### I. Compute odometry using appropriate kinematics
 - Compute robot linear and angular velocities v, ⍵ from wheel encoders
 - Compute odometry using both Euler and Runge-Kutta integration
-- ROS parameter for initial pose
+- - ROS parameter for initial pose
 - Calibrate (fine-tune) robot parameters to match ground truth
 #### II. Compute wheel control speeds from v, ⍵
 #### III. Add a service to reset the odometry to a specified pose (x,y,θ)
