@@ -10,7 +10,7 @@ int main(int argc, char **argv) {
     }
 
     ros::NodeHandle n;
-    ros::ServiceClient client = n.serviceClient<project1::ResetPose>("reset_pose");
+    ros::ServiceClient client = n.serviceClient<project1::ResetPose>("resetpose");
     project1::ResetPose srv;
 
     //Reset pose have argv[1] = new x, argv[2] = new y, argv[3] = new theta
