@@ -18,7 +18,7 @@
     <param name="wheels/w" value="0.169"/>
     <!-- Gear ratio (wheel - motor) -->
     <param name="wheels/T" value="5"/>
-    <!-- Encoders resolution [counts (ticks) per revolution] -->
+    <!-- Encoders resolution [measured in counts (ticks) per revolution] -->
     <param name="wheels/N" value="43"/>
 
     <!-- bag1: 0.008653 0.004113 -0.028451

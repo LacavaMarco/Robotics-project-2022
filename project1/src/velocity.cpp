@@ -30,13 +30,13 @@ public:
     }
 
     // Receive the wheel_states message and for each wheel given the position in ticks,
-    // compute the wheel velocity in or rad/s. Then by applying the inverse formula of
+    // compute the wheel velocity in rad/s. Then by applying the inverse formula of
     // the kinematic model of the mobile robot with four mecanum wheels, compute robot linear
     // and angular speed and publish them on cmd_vel
     void velocityCallback(const sensor_msgs::JointState::ConstPtr& msg){
         // Ticks are stored in the array position [fl, fr, rl, rr] and they
         // increase every timestep: to compute each wheel angular velocity I need to divide the difference
-        // between current and previous ticks by the difference between current and previous time stamp (?)
+        // between current and previous ticks by the difference between current and previous time stamp
         ros::Time current_time = msg->header.stamp;
         double dt = (current_time - last_time).toSec();
         // ROS_INFO ("dt = %f", dt);
@@ -77,7 +77,7 @@ public:
         }
     }
 
-    // Compute robot linear and angular velocity from wheel angular velocities
+    // Compute robot linear and angular velocity from wheels angular velocity
     std::array<double, 3> computeRobotVelocity(std::array<double, 4> wheels_angular_vel) {
         std::array<double, 3> robot_vel = {{0.0, 0.0, 0.0}};
         // The data retrieved from the bag considers the wheels in the order fl, fr, rl, rr, while the
