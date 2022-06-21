@@ -8,7 +8,7 @@
 		<param name="angle_min" value="-3.14"/>
 		<param name="angle_max" value="3.14"/>
 		<param name="angle_increment" value="0.0058"/> <!-- default: 0.0058, fs: 0.0021696081385, rs: 0.00432716263458-->
-		<param name="scan_time" value="0.0333333333333"/> <!-- laser frequency fs: 0.310600012541, rs: 0.0798000022769-->
+		<param name="scan_time" value="0.0333333333333"/> <!-- laser frequency deafult: 0.0333333333333, fs: 0.310600012541, rs: 0.0798000022769-->
 		<param name="range_min" value="0.0799999982119"/> <!-- laser min/max range -->
 		<param name="range_max" value="16.0"/>
 	</node>

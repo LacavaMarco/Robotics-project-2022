@@ -1,6 +1,6 @@
 <launch>
   <arg name="scan_topic"  default="scan_multi" />
-  <arg name="base_frame"  default="base_link"/>
+  <arg name="base_frame"  default="base_footprint"/>
   <arg name="odom_frame"  default="odom"/>
 
   <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen">
@@ -17,7 +17,7 @@
     <param name="lsigma" value="0.075"/>
     <param name="ogain" value="3.0"/>
     <param name="lskip" value="0"/>
-    <param name="minimumScore" value="200"/>
+    <param name="minimumScore" value="100"/>
     <param name="srr" value="0.1"/>
     <param name="srt" value="0.2"/>
     <param name="str" value="0.1"/>
