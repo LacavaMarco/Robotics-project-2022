@@ -9,8 +9,8 @@
 		<param name="angle_max" value="3.14"/>
 		<param name="angle_increment" value="0.0058"/> <!-- default: 0.0058, fs: 0.0021696081385, rs: 0.00432716263458-->
 		<param name="scan_time" value="0.0333333333333"/> <!-- laser frequency deafult: 0.0333333333333, fs: 0.310600012541, rs: 0.0798000022769-->
-		<param name="range_min" value="0.0799999982119"/> <!-- laser min/max range -->
-		<param name="range_max" value="16.0"/>
+		<param name="range_min" value="0.0799999982119"/> <!-- laser min range -->
+		<param name="range_max" value="16.0"/> <!-- laser max range -->
 	</node>
 
 	<node pkg="tf" type="static_transform_publisher" name="base_footprint_to_base_link" args="0.0 0.0 0.0 0.0 0.0 0.0 1.0 base_footprint base_link 100" />
@@ -18,5 +18,4 @@
 	<node pkg="tf" type="static_transform_publisher" name="base_link_to_front_scan" args="0.35 0.0 0.0 0.0 0.0 0.5150381 0.8571673 base_link laser_front 100" />
 	<node pkg="tf" type="static_transform_publisher" name="base_link_to_rear_scan" args="-0.35 0.0 0.0 0.0 0.0 0.866 0.5 base_link laser_rear 100" />
 
-	<!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(find project2)/rviz/robot_navigation.rviz"/> -->
 </launch>
