@@ -57,7 +57,7 @@ def trajectoryCallback(amclpose):
 # bgr convert the current image, then rotate and save it in the workspace folder as trajectory.png
 def handle_savetrajectory(request):
     global image
-    filename = cwd + '/trajectory.png'
+    filename = cwd + '/src/project2/maps/trajectory.png'
     print ("Saving image...")
 
     # r, g and b represent the quantity of red, blue and green for each pixel of the map: each pixel colored during
