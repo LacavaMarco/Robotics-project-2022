@@ -1,0 +1,20 @@
+10565431 Marco Lacava
+10675881 Lorenzo Aicardi
+
+The archive contains the package project2 folder containing all the necessary source code.
+
+Several folders are contained in “project2”: “launch” and “config” folders contain the launch files for mapping, localization and the scan merger and their configuration settings; “rviz” folder contains custom configurations to automatically run rviz during mapping and localization; “src” contains the node that publishes the odometry as a tf; “srv” and “script” contain the definition of the service to save the robot trajectory and the python script of the service client and server; “maps” contains the saved images of the map and the trajectories of the robot.
+
+The structure of the tf tree is: map(odom(base_footprint(base_link(laser_front, laser_rear)))).
+
+Bag1 was used to create the map, bags 2 and 3 were used for localization.
+
+To save an image with the map and the trajectory of the robot the node map_saver was used. Its implementation can be found in mapsaver.py.
+
+To perform mapping you need to launch the mapping.launch file, to save the map created you need to execute the command “rosrun map_server map_saver -f map”.
+To perform localization you need to launch the localization.launch file. To save the trajectory of the robot, before running the bag you need to start the server node by executing the command “rosrun project2 mapsaver.py” then to save the current trajectory of the robot you need to call the service with the command “rosservice call /savetrajectory” (the trajectory will be saved in the “maps” folder as trajectory.png).
+
+Any bag must be run with the --clock option.
+In the mapping and localization launch files we included the static tf from base_footprint to base_link and from base_link to laser_front and laser_rear since sometimes the tfs were not correctly published by the bags.
+Rather than using OpenCV to write the trajectory of the robot on the map, we color the correct pixels by directly modifying the map occupancy grid matrix. To better differentiate the trajectory from the map, we postproduced the image and represented the trajectory in green. Finally, we rotated the image of 90 degrees to have the same orientation of the one showed in rviz.
+

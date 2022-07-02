@@ -22,7 +22,7 @@ def mapCallback(data):
     x0 = data.info.origin.position.x
     y0 = data.info.origin.position.y
 
-    print(resolution, width, height, x0, y0)
+    # print(resolution, width, height, x0, y0)
 
     # initialize a matrix of zeros with the size of the map image
     global size
@@ -57,7 +57,7 @@ def trajectoryCallback(amclpose):
 # bgr convert the current image, then rotate and save it in the workspace folder as trajectory.png
 def handle_savetrajectory(request):
     global image
-    filename = cwd + '/src/project2/maps/trajectory.png'
+    filename = cwd + '/trajectory.png'
     print ("Saving image...")
 
     # r, g and b represent the quantity of red, blue and green for each pixel of the map: each pixel colored during
